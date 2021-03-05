@@ -1,0 +1,17 @@
+html,
+body,
+#app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #eee;
+}
+
+.pro_ct_dis .distpicker-address-wrapper select {
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 12px;
+  outline: none;
+  width: 32%;
+  height: 30px;
+}

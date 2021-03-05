@@ -1,15 +1,15 @@
 <template>
-  <div>
-    
-  </div>
+ <div class="update-user">
+
+ </div>
 </template>
 
 <script>
 export default {
-
+name: "UpdateUser"
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

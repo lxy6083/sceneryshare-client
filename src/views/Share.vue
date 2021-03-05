@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+    所有动态
   </div>
 </template>
 

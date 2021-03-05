@@ -1,15 +1,15 @@
 <template>
-  <div>
-    
+  <div class="feedback">
+
   </div>
 </template>
 
 <script>
 export default {
-
+  name: "Feedback"
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>
