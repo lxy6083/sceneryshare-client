@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-const routes = [{
+const routes = [
+    {
         path: '/',
         redirect: 'home'
     },
@@ -38,17 +39,29 @@ const routes = [{
             import ('@/views/Share.vue')
     },
     {
-        path: '/my-share',
+        path: '/myShare',
         name: 'MyShare',
         component: () =>
             import ('@/views/MyShare.vue')
     },
     {
-      path: '/my-collection',
+      path: '/myCollection',
       name: 'MyCollection',
       component: () =>
-          import ('@/views/Home.vue')
-  },
+          import ('@/views/MyCollection.vue')
+    },
+    {
+        path: '/updateUser',
+        name: 'UpdateUser',
+        component: () =>
+            import ('@/views/UpdateUser.vue')
+    },
+    {
+        path: '/feedback',
+        name: 'Feedback',
+        component: () =>
+            import ('@/views/Feedback.vue')
+    },
 ]
 
 const router = new VueRouter({

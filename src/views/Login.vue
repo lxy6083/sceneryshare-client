@@ -118,7 +118,7 @@ export default {
                   this.$store.commit('setUsername',res.userMsg.username);
                   this.$store.commit('setAvatar',res.userMsg.avatar);
                 }else {
-                  this.notify(res.message,"error");
+                  this.notify(res.msg,"error");
                 }
             });
 				}

@@ -14,6 +14,10 @@ export const recoverPwd = (params) => post(`/user/recoverPwd`, params);
 export const updateUser = (params) => post(`/user/update`, params);
 
 //注销用户
-export const deleteUser = (params) => post(`/user/delete`, params);
+export const deleteUser = (userId) => get(`/user/delete?id=${userId}`);
+
+//通过主键查找用户信息
+export const getByPrimaryKey = (userId) => get(`/user/getByPrimaryKey?id=${userId}`);
+
 
 

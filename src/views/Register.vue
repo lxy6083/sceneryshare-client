@@ -144,11 +144,11 @@ export default {
               _this.$router.push({path: '/login'});
             },2000);
           } else {
-            this.notify(res.message, 'error');
+            this.notify(res.msg, 'error');
           }
         })
         .catch(err => {
-          this.notify(err.message, 'error');
+          this.notify(err.msg, 'error');
         })
       },
       onChangeProvince(data) {

@@ -33,9 +33,11 @@
 import {navMsg,loginMsg,menuList} from '../assets/js/header';
 import {mapGetters} from 'vuex';
 import {deleteUser} from "../api";
+import {mixin} from "../mixins";
 
 export default {
   name: 'the-header',
+  mixins: [mixin],
   data() {
     return {
       navMsg: [],     //左侧导航栏
@@ -87,7 +89,9 @@ export default {
         this.delete(this.userId);
       } else {
         //页面跳转
-        this.$router.push({path: path});
+        if (this.$route.path !== path) {
+          this.$router.push({ path: path});
+        }
       }
     },
     delete(userId) {
@@ -96,18 +100,18 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        let params = new URLSearchParams();
-        params.append('userId', userId);
-        deleteUser(params)
+        deleteUser(userId)
             .then(res => {
-              if (res.code == 1) {
+              if (res == 1) {
                 this.notify('用户注销成功', 'success');
+                this.$store.commit('setIsLogin', false);
+                this.$router.go(0);
               } else {
-                this.notify(res.msg, 'error');
+                this.notify('用户注销失败', 'error');
               }
             })
             .catch(err => {
-              this.notify(err.msg, 'error');
+              this.notify('用户注销失败', 'error');
             })
       }).catch(() => {
         this.$message({
@@ -214,5 +218,6 @@ export default {
 
   .menu li:hover {
     background: #f4f4f4;
+    cursor: pointer;
   }
 </style>
