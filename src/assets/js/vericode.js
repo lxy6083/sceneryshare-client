@@ -5,7 +5,7 @@ function GVerify(options) { // 创建一个图形验证码对象，接收options
         canvasId: 'verifyCanvas', // canvas的ID
         width: '80', // 默认canvas宽度
         height: '30', // 默认canvas高度
-        type: 'number', // 图形验证码默认类型blend:数字字母混合类型、number:纯数字、letter:纯字母
+        type: 'blend', // 图形验证码默认类型blend:数字字母混合类型、number:纯数字、letter:纯字母
         code: ''
     }
 
@@ -50,6 +50,7 @@ GVerify.prototype = {
 
         /** 生成验证码**/
         refresh: function() {
+            this.options.code = '';
             var canvas = document.getElementById(this.options.canvasId)
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d')

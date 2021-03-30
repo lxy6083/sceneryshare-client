@@ -2,8 +2,8 @@
 const navMsg = [
   {name: '首页',path: '/home'},
   {name: '动态',path: '/share'},
-  {name: '我的动态',path: '/my-share'},
-  {name: '我的收藏',path: '/my-collection'}
+  {name: '我的动态',path: '/myShare'},
+  {name: '我的收藏',path: '/myCollection'}
 ]
 
 //右侧导航栏

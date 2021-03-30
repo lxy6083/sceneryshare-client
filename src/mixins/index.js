@@ -34,7 +34,7 @@ export const mixin = {
             return province + ' ' + city + ' ' + district + ' ' + scenery;
         },
 
-        //图片上传前的校验
+        //头像上传前的校验
         beforeAvatarUpload(file) {
             const isJPG = (file.type === 'image/jpeg') || (file.type === 'image/png') || (file.type === 'image/gif');
             if (!isJPG) {
@@ -49,14 +49,40 @@ export const mixin = {
             return true;
         },
 
-        //图片上传成功之后刷新页面，提示信息
+        //头像上传成功之后刷新页面，提示信息
         handleAvatarSuccess(res, file) {
             let _this = this;
-            if (res.code == 1) {
+            if (res.code === 1) {
                 _this.getData();
                 _this.notify('头像上传成功', 'success');
             } else {
                 _this.notify('头像上传失败', 'error');
+            }
+        },
+        //图片/视频上传前的校验
+        beforePicUpload(file) {
+            const isJPG = (file.type === 'image/jpeg') || (file.type === 'image/png') || (file.type === 'image/gif')
+                || (file.type === 'audio/mp4') || (file.type === 'video/mp4');
+            if (!isJPG) {
+                this.$message.error('上传的文件只能是JPG、PNG、GIF、MP4格式的');
+                return false;
+            }
+            const isLt2M = (file.size / 1024 / 1024) < 5;
+            if (!isLt2M) {
+                this.$message.error('上传的文件大小不能超过5M');
+                return false;
+            }
+            return true;
+        },
+
+        //图片/视频上传成功之后刷新页面，提示信息
+        handlePicSuccess(res, file) {
+            let _this = this;
+            if (res.code === 1) {
+                _this.notify('动态上传成功', 'success');
+                _this.$router.go(0);
+            } else {
+                _this.notify('动态上传失败', 'error');
             }
         },
         //弹出删除窗口 
@@ -70,14 +96,7 @@ export const mixin = {
             this.multipleSelection = value;
         },
 
-        //批量删除已经选择的项
-        delAll() {
-            for (let item of this.multipleSelection) {
-                this.handleDelete(item.id);
-                this.delRow();
-            }
-            this.multipleSelection = [];
-        },
+
 
     }
 }

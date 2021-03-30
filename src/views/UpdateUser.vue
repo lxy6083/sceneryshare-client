@@ -4,7 +4,12 @@
      <span>用户信息修改</span>
      <el-divider></el-divider>
      <div id="user">
-       <img :src="getUrl(avatar)">
+       <div class="avatar">
+         <img :src="getUrl(avatar)">
+       </div>
+       <el-upload :action="uploadUrl(userId)" :before-upload="beforeAvatarUpload" :on-success="handleAvatarSuccess">
+         <el-button size="mini" class="update-button">更新头像</el-button>
+       </el-upload>
      </div>
      <el-form :model="updateForm" ref="updateForm" label-width="80px" :rules="updateRules" class="updateForm">
        <el-form-item prop="username" label="用户名" size="mini">
@@ -30,16 +35,16 @@
        </el-form-item>
      </el-form>
      <span slot="footer">
-          <el-button size="mini" @click="goBack(-1)">取消</el-button>
-          <el-button size="mini" type="primary" @click="submitForm('updateForm')">确定</el-button>
-        </span>
+       <el-button size="mini" @click="goBack(-1)">取消</el-button>
+       <el-button size="mini" type="primary" @click="submitForm('updateForm')">确定</el-button>
+     </span>
    </div>
  </div>
 </template>
 
 <script>
 import {mixin} from "../mixins";
-import {getByPrimaryKey, setUser, updateUser} from "../api";
+import {getByPrimaryKey, updateUser} from "../api";
 import {mapGetters} from 'vuex';
 
 export default {
@@ -94,6 +99,10 @@ export default {
 
   },
   methods: {
+    //根据相对路径获取绝对路径
+    getUrl(url) {
+      return `${this.$store.state.configure.HOST}/${url}`;
+    },
     getMsg(userId) {
       getByPrimaryKey(userId)
           .then(res => {
@@ -160,10 +169,22 @@ export default {
     goBack(index) {
       this.$router.go(index);
     },
+    //更新图片
+    uploadUrl(id) {
+      return `${this.$store.state.configure.HOST}/user/updateUserAvatar?id=${id}`;
+    },
+    //刷新信息
+    getData() {
+      getByPrimaryKey(this.userId)
+      .then(res => {
+        this.$store.commit('setAvatar', res.avatar);
+      })
+    }
   },
   computed: {
     ...mapGetters([
-      'userId'
+      'userId',
+      'avatar',
     ])
   },
   mounted() {
@@ -174,6 +195,7 @@ export default {
 
 <style scoped>
   .update_box > span {
+    position: relative;
     display: block;
     text-align: center;
     margin-top: 20px;
@@ -188,7 +210,13 @@ export default {
   }
 
   #user {
-    margin-left: 300px;
+    width: 100px;
+    margin-left: 250px;
+    text-align: center;
+  }
+
+  .update-button {
+    margin-top: 10px;
   }
 
   .update_box {
@@ -205,5 +233,13 @@ export default {
   .updateForm {
     margin-top: 30px;
     width: 90%;
+  }
+
+  .avatar img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    object-position: center;
   }
 </style>

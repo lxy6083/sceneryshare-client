@@ -191,8 +191,11 @@ export default {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    height: 60px;
     border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    object-position: center;
   }
 
   .menu {

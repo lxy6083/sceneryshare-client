@@ -4,14 +4,8 @@ body,
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: #eee;
+    background-color: #41b883;
 }
 
-.pro_ct_dis .distpicker-address-wrapper select {
-  padding-top: 0;
-  padding-bottom: 0;
-  font-size: 12px;
-  outline: none;
-  width: 32%;
-  height: 30px;
-}
+
+

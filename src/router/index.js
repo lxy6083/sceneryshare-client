@@ -62,6 +62,12 @@ const routes = [
         component: () =>
             import ('@/views/Feedback.vue')
     },
+    {
+        path: '/addShare',
+        name: 'AddShare',
+        component: () =>
+            import ('@/views/AddShare.vue')
+    },
 ]
 
 const router = new VueRouter({
