@@ -34,18 +34,21 @@
           </div>
           <div class="footer">
             <div class="collect footer-item">
-              <div class="el-icon-star-on" v-if="item.collect === 1">
+              <div class="el-icon-collection-tag" v-if="isCollect(item.id) === true" @click="cancelCollect(item.id)">
                 <span>已收藏</span>
               </div>
-              <div class="el-icon-star-off" v-if="item.collect === 0">
+              <div class="el-icon-collection-tag" v-else @click="collect(item.id)">
                 <span>未收藏</span>
               </div>
             </div>
             <div class="comment el-icon-s-comment footer-item">
-              <span>{{item.commentCount}}</span>
+              <span>{{item.commentNum}}</span>
             </div>
-            <div class="rank footer-item">
-              <span>{{'评分 ' + item.rank}}</span>
+            <div class="rank footer-item" v-if="item.scoreNum !== 0">
+              <span>{{'评分 ' + item.scoreSum / item.scoreNum}}</span>
+            </div>
+            <div class="rank footer-item el-icon-star-off" v-else>
+              <span>暂无评分</span>
             </div>
           </div>
         </div>
@@ -57,17 +60,29 @@
 <script>
 import {mixin} from "../mixins";
 import {mapGetters} from 'vuex';
-import {getByPrimaryKey, getSceneryByPrimaryKey, getShareByUserId} from "../api";
+import {
+  cancelCollect,
+  collect,
+  getAllCollect,
+  getAverageScore,
+  getByPrimaryKey, getComments,
+  getSceneryByPrimaryKey,
+  getScoreNum,
+  getScoreSum,
+  getShareByUserId
+} from "../api";
 
 export default {
   mixins: [mixin],
   data() {
     return {
-      myShare: []     //我的动态
+      myShare: [],      //我的动态
+      collects: [],     //收藏列表
     }
   },
   created() {
     this.getData();
+    this.getAllCollect();
   },
   methods: {
     //根据相对路径获取绝对路径
@@ -82,7 +97,6 @@ export default {
     getData() {
       getShareByUserId(this.userId)
       .then(res => {
-        console.log(res);
         for (let item of res) {
           if (item.visible === 1) {
             this.myShare.push(item);
@@ -90,6 +104,8 @@ export default {
         }
         this.getUserInfo();
         this.getSceneryInfo();
+        this.getAverageScore();
+        this.getComments();
         console.log(this.myShare);
       })
       .catch(err => {
@@ -120,7 +136,95 @@ export default {
         })
       })
     },
-    //获取
+    //获取评分
+    getAverageScore() {
+      this.myShare.forEach(item => {
+        getScoreNum(item.id)
+        .then(res => {
+          this.$set(item,'scoreNum',res);
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        getScoreSum(item.id)
+        .then(res => {
+          this.$set(item,'scoreSum',res);
+        })
+        .catch(err => {
+          console.log(err);
+        })
+      })
+    },
+    //获取收藏列表
+    getAllCollect() {
+      getAllCollect(this.userId)
+      .then(res => {
+        this.collects = res;
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    //判断收藏列表中有没有动态列表中的动态
+    isCollect(sceneryshareId) {
+      for (let item of this.collects) {
+        if (item.sceneryshareId === sceneryshareId) {
+          return true;
+        }
+      }
+      return false;
+    },
+    //获取评论信息
+    getComments() {
+      this.myShare.forEach(item => {
+        getComments(item.id)
+        .then(res => {
+          if (res === null) {
+            this.$set(item,'commentNum',0);
+          } else {
+            this.$set(item,'commentNum',res.length);
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        })
+      })
+    },
+    //取消收藏
+    cancelCollect(id) {
+      cancelCollect(this.userId,id)
+      .then(res => {
+        if (res === true) {
+          this.notify('已取消收藏','success');
+          this.getData();
+          this.getAllCollect();
+        } else {
+          this.notify('取消收藏失败','error');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    //收藏
+    collect(id) {
+      let params = new URLSearchParams();
+      params.append('userId',this.userId);
+      params.append('sceneryshareId',id);
+      collect(params)
+      .then(res => {
+        if (res.code === 1) {
+          this.notify(res.msg,'success');
+          this.getData();
+          this.getAllCollect();
+        } else {
+          this.notify(res.msg,'error');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
   },
   computed: {
     ...mapGetters([
@@ -213,16 +317,26 @@ export default {
     line-height: 30px;
     font-size: 24px;
     color: #fb7299;
+    vertical-align: middle;
   }
 
   .body .footer .footer-item {
     display: inline-block;
     width: 20%;
     vertical-align: middle;
+    height: 30px;
+    line-height: 30px;
   }
 
-  .body .footer span {
+  .body .footer .footer-item span {
+    display: inline-block;
     font-size: 14px;
     color: #aaaaaa;
+    vertical-align: middle;
+    height: 30px;
+    line-height: 25px;
+    padding-left: 5px;
   }
+
+
 </style>

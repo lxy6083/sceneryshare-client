@@ -1,5 +1,6 @@
 import {get, post } from './http';
 import user from "../store/user";
+import {sceneryType} from "../assets/js/options";
 
 /* =======================用户相关函数====================== */
 //判断用户是否登录成功
@@ -53,3 +54,26 @@ export const getSceneryByPrimaryKey = (id) => get(`/scenery/getByPrimaryKey?id=$
 //通过用户id获取动态列表
 export const getShareByUserId = (userId) => get(`/sceneryshare/getSceneryByUserId?userId=${userId}`);
 
+/* =======================评分相关函数====================== */
+
+//获取总评分
+export const getScoreSum = (sceneryshareId) => get(`/rank/getScoreSum?sceneryshareId=${sceneryshareId}`);
+
+//获取总评分人数
+export const getScoreNum = (sceneryshareId) => get(`/rank/getScoreNum?sceneryshareId=${sceneryshareId}`);
+
+/* =======================收藏相关函数====================== */
+
+//通过用户id获取收藏列表
+export const getAllCollect = (userId) => get(`/collect/getAllCollect?userId=${userId}`);
+
+//收藏
+export const collect = (params) => post(`/collect/insert`, params);
+
+//取消收藏
+export const cancelCollect = (userId,sceneryshareId) => get(`/collect/delete?userId=${userId}&sceneryshareId=${sceneryshareId}`);
+
+/* =======================评论相关函数====================== */
+
+//通过动态id获取评论列表
+export const getComments = (sceneryshareId) => get(`/comment/getBySceneryshareId?sceneryshareId=${sceneryshareId}`);
