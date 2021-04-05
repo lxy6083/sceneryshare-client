@@ -7,6 +7,10 @@ import router from './router'
 import store from './store/index'
 import VDistpicker from 'v-distpicker'
 import VueQuillEditor from 'vue-quill-editor'
+import VueVideoPlayer from 'vue-video-player'
+import 'video.js/dist/video-js.css'
+import 'vue-video-player/src/custom-theme.css'
+
 
 // require styles
 import 'quill/dist/quill.core.css'
@@ -22,7 +26,10 @@ Vue.use(BaiduMap, {
 
 Vue.component('v-distpicker', VDistpicker);
 
-Vue.use(ElementUI, VueQuillEditor);
+Vue.use(ElementUI);
+Vue.use(VueQuillEditor);
+Vue.use(VueVideoPlayer);
+
 Vue.config.productionTip = false
 
 new Vue({

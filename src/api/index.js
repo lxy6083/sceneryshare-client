@@ -52,7 +52,13 @@ export const getSceneryByPrimaryKey = (id) => get(`/scenery/getByPrimaryKey?id=$
 /* =======================动态相关函数====================== */
 
 //通过用户id获取动态列表
-export const getShareByUserId = (userId) => get(`/sceneryshare/getSceneryByUserId?userId=${userId}`);
+export const getShareByUserId = (userId) => get(`/sceneryshare/user/scenery?userId=${userId}`);
+
+//通过动态id获取动态详情
+export const getShareByPrimaryKey = (id) => get(`/sceneryshare/getByPrimaryKey?id=${id}`);
+
+//获取所有动态
+export const getAllShare = () => get(`/sceneryshare/getAllSceneryShare`);
 
 /* =======================评分相关函数====================== */
 
