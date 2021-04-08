@@ -4,7 +4,7 @@
       <el-button type="primary" @click="toAddShare">添加新动态</el-button>
     </div>
     <div class="all-share" v-for="item in allShare">
-      <div class="share">
+      <div class="share" @click="toShareDetail(item.id)">
         <div class="essence" v-if="item.essence === 1">
           <div class="triangle"></div>
           <div class="text">精</div>
@@ -31,6 +31,12 @@
           </div>
           <div class="pic" v-if="item.pic.toLowerCase().endsWith('mp4')">
             <video :src="getUrl(item.pic)" style="width:100%" @click="playVideo(item.pic)"/>
+          </div>
+          <div class="status-info">
+            <span>天气：{{changeWeather(item.weather)}}</span>
+            <span>时段：{{changeTimeBucket(item.timeBucket)}}</span>
+            <span>季节：{{changeSeason(item.season)}}</span>
+            <span>朝向：{{changeBearing(item.bearing)}}</span>
           </div>
           <div class="footer">
             <div class="collect footer-item">
@@ -142,7 +148,6 @@ export default {
             this.getSceneryInfo();
             this.getAverageScore();
             this.getComments();
-            console.log(this.allShare);
           })
           .catch(err => {
             console.log(err);
@@ -282,6 +287,15 @@ export default {
     },
     playerStateChanged ( player) {
     },
+    //查看详细信息
+    toShareDetail(id) {
+      this.$router.push({
+        path: `/shareDetail`,
+        query: {
+          id: id
+        }
+      })
+    }
   },
   computed: {
     ...mapGetters([
@@ -398,5 +412,16 @@ export default {
     height: 30px;
     line-height: 25px;
     padding-left: 5px;
+  }
+
+  .status-info {
+    margin-top: 10px;
+  }
+
+  .status-info span {
+    font-size: 12px;
+    color: #aaaaaa;
+    display: inline-block;
+    margin-right: 10px;
   }
 </style>

@@ -68,6 +68,12 @@ const routes = [
         component: () =>
             import ('@/views/AddShare.vue')
     },
+    {
+        path: '/shareDetail',
+        name: 'ShareDetail',
+        component: () =>
+            import ('@/views/ShareDetail.vue')
+    },
 ]
 
 const router = new VueRouter({

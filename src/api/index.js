@@ -68,6 +68,9 @@ export const getScoreSum = (sceneryshareId) => get(`/rank/getScoreSum?scenerysha
 //获取总评分人数
 export const getScoreNum = (sceneryshareId) => get(`/rank/getScoreNum?sceneryshareId=${sceneryshareId}`);
 
+//获取评分
+export const getScore = (sceneryshareId,userId) => get(`/rank/getMark?userId=${userId}&sceneryshareId=${sceneryshareId}`);
+
 /* =======================收藏相关函数====================== */
 
 //通过用户id获取收藏列表
@@ -78,6 +81,9 @@ export const collect = (params) => post(`/collect/insert`, params);
 
 //取消收藏
 export const cancelCollect = (userId,sceneryshareId) => get(`/collect/delete?userId=${userId}&sceneryshareId=${sceneryshareId}`);
+
+//是否收藏
+export const isCollect = (sceneryshareId,userId) => get(`/collect/isCollect?userId=${userId}&sceneryshareId=${sceneryshareId}`);
 
 /* =======================评论相关函数====================== */
 
