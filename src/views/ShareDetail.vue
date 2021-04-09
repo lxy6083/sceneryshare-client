@@ -1,5 +1,32 @@
 <template>
   <div class="share-detail">
+    <div class="rate">
+      <span>评分</span>
+      <el-rate
+          v-model="rate"
+          @change="mark"
+          show-text
+          :texts="['极差', '失望', '一般', '满意', '惊喜']"
+          style="display: inline-block; margin-left: 20px; margin-right: 50px"/>
+      <span>平均评分</span>
+      <el-rate
+          v-if="share.avgScore > 0"
+          style="display: inline-block; margin-left: 20px; margin-right: 50px"
+          v-model="share.avgScore"
+          disabled
+          show-score
+          text-color="#ff9900"
+          score-template="{value}">
+      </el-rate>
+      <el-rate
+          v-else
+          style="display: inline-block; margin-left: 20px; margin-right: 50px"
+          disabled
+          show-score
+          text-color="#ff9900"
+          score-template="未评分">
+      </el-rate>
+    </div>
     <div class="share">
       <div class="essence">
         <div class="triangle"></div>
@@ -48,11 +75,44 @@
           <div class="comment el-icon-s-comment footer-item">
             <span>{{share.commentNum}}</span>
           </div>
-          <div class="rank footer-item" v-if="share.scoreNum !== 0">
-            <span>{{'评分 ' + share.scoreSum / share.scoreNum}}</span>
+          <div class="rank footer-item el-icon-star-off" v-if="share.avgScore !== 0">
+            <span>{{share.avgScore}}</span>
           </div>
           <div class="rank footer-item el-icon-star-off" v-else>
             <span>暂无评分</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--    评论区域-->
+    <div class="comment-area">
+      <div class="submit-comment">
+        <div class="avatar">
+          <img :src="getUrl(avatar)">
+        </div>
+        <div class="comment-textarea">
+          <el-input
+              type="textarea"
+              resize="none"
+              :rows="2"
+              placeholder="请输入内容"
+              v-model="comment">
+          </el-input>
+          <el-button type="primary" circle size="max" @click="submitComment">发表评论</el-button>
+        </div>
+      </div>
+      <div class="comments">
+        <div class="comment">
+          <div class="name-time">
+            <div class="username" v-if="share.user && share.user.username">
+              {{share.user.username}}
+            </div>
+            <div class="createTime">
+              {{share.createTime}}
+            </div>
+          </div>
+          <div class="comment-text">
+
           </div>
         </div>
       </div>
@@ -77,13 +137,13 @@ import {mixin} from "../mixins";
 import {mapGetters} from 'vuex';
 import {
   cancelCollect, collect,
-  getAllCollect,
+  getAllCollect, getAvgScore,
   getByPrimaryKey, getComments,
   getScore,
   getScoreNum,
   getScoreSum,
   getShareByPrimaryKey,
-  isCollect
+  isCollect, mark
 } from "../api";
 export default {
   name: "ShareDetail",
@@ -93,6 +153,8 @@ export default {
       id: '',               //动态id
       share: {},            //动态
       comments: [],         //评论列表
+      rate: 0,              //评分
+      comment: '',          //评论
       videoVisible: false,  //视频播放弹框是否可见
       playerOptions: {
         // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
@@ -123,6 +185,7 @@ export default {
   created() {
     this.id = this.$route.query.id;
     this.getData();
+    this.getAverageScore();
   },
   methods: {
     //根据相对路径获取绝对路径
@@ -157,10 +220,9 @@ export default {
         this.share = res;
         this.isCollect();
         this.getScore();
-        this.getAverageScore();
         this.getUserInfo();
         this.getComments();
-        console.log(this.share);
+        this.getAverageScore();
       })
       .catch(err => {
         console.log(err);
@@ -188,16 +250,9 @@ export default {
     },
     //获取平均评分
     getAverageScore() {
-      getScoreSum(this.id)
+      getAvgScore(this.id)
       .then(res => {
-        this.$set(this.share,'scoreSum',res);
-      })
-      .catch(err => {
-        console.log(err);
-      })
-      getScoreNum(this.id)
-      .then(res => {
-        this.$set(this.share,'scoreNum',res);
+        this.$set(this.share,'avgScore',res);
       })
       .catch(err => {
         console.log(err);
@@ -274,17 +329,47 @@ export default {
           console.log(err);
         })
       })
-    }
+    },
+    //评分
+    mark() {
+      let params = new URLSearchParams();
+      params.append('sceneryshareId',this.id);
+      params.append('userId',this.userId);
+      params.append('score',this.rate);
+      mark(params)
+      .then(res => {
+        if (res.code === 1) {
+          this.notify(res.msg,'success');
+        } else {
+          this.notify(res.msg,'error');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+
   },
   computed: {
     ...mapGetters([
-        'userId'
+        'userId',
+        'avatar',
+        'username'
     ])
   }
 }
 </script>
 
 <style scoped>
+  .rate {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%,0);
+    padding: 30px 20px;
+    background-color: #ffffff;
+    margin-top: 20px;
+    width: 800px;
+  }
   .share {
     position: relative;
     left: 50%;
@@ -293,7 +378,6 @@ export default {
     background-color: #ffffff;
     margin-top: 20px;
     width: 800px;
-    cursor: pointer;
   }
 
   .essence {

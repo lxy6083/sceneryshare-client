@@ -62,14 +62,14 @@ export const getAllShare = () => get(`/sceneryshare/getAllSceneryShare`);
 
 /* =======================评分相关函数====================== */
 
-//获取总评分
-export const getScoreSum = (sceneryshareId) => get(`/rank/getScoreSum?sceneryshareId=${sceneryshareId}`);
-
-//获取总评分人数
-export const getScoreNum = (sceneryshareId) => get(`/rank/getScoreNum?sceneryshareId=${sceneryshareId}`);
+//获取平均分
+export const getAvgScore = (sceneryshareId) => get(`/rank/getAvgScore?sceneryshareId=${sceneryshareId}`);
 
 //获取评分
 export const getScore = (sceneryshareId,userId) => get(`/rank/getMark?userId=${userId}&sceneryshareId=${sceneryshareId}`);
+
+//评分
+export const mark = (params) => post(`/rank/insert`, params);
 
 /* =======================收藏相关函数====================== */
 

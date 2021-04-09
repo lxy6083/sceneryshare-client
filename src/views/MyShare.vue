@@ -50,8 +50,8 @@
             <div class="comment el-icon-s-comment footer-item">
               <span>{{item.commentNum}}</span>
             </div>
-            <div class="rank footer-item" v-if="item.scoreNum !== 0">
-              <span>{{'评分 ' + item.scoreSum / item.scoreNum}}</span>
+            <div class="rank footer-item el-icon-star-off" v-if="item.avgScore !== 0">
+              <span>{{item.avgScore}}</span>
             </div>
             <div class="rank footer-item el-icon-star-off" v-else>
               <span>暂无评分</span>
@@ -82,7 +82,7 @@ import {
   cancelCollect,
   collect,
   getAllCollect,
-  getAverageScore,
+  getAverageScore, getAvgScore,
   getByPrimaryKey, getComments,
   getSceneryByPrimaryKey,
   getScoreNum,
@@ -178,20 +178,13 @@ export default {
         })
       })
     },
-    //获取评分
+    //获取平均评分
     getAverageScore() {
       this.myShare.forEach(item => {
-        getScoreNum(item.id)
-        .then(res => {
-          this.$set(item,'scoreNum',res);
-        })
-        .catch(err => {
-          console.log(err)
-        })
-        getScoreSum(item.id)
-        .then(res => {
-          this.$set(item,'scoreSum',res);
-        })
+        getAvgScore(item.id)
+            .then(res => {
+              this.$set(item,'avgScore',res);
+            })
         .catch(err => {
           console.log(err);
         })
