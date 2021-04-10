@@ -8,6 +8,11 @@ module.exports = {
             'BMap': 'BMap',
             'BMap_Symbol_SHAPE_POINT': 'BMap_Symbol_SHAPE_POINT'
         },
+    },
+    pluginOptions: {
+        'style-resources-loader': {
+            preProcessor: 'scss',
+            patterns: []
+        }
     }
-
 };

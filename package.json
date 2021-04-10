@@ -10,6 +10,8 @@
         "axios": "^0.21.0",
         "core-js": "^3.6.5",
         "element-ui": "^2.14.1",
+        "less-loader": "^5.0.0",
+        "node-sass": "^4.14.1",
         "v-distpicker": "^1.2.9",
         "vue": "^2.6.11",
         "vue-baidu-map": "^0.21.22",
@@ -24,7 +26,8 @@
         "@vue/cli-plugin-vuex": "~4.5.0",
         "@vue/cli-service": "~4.5.0",
         "less": "^3.0.4",
-        "less-loader": "^5.0.0",
+        "sass-loader": "^7.3.1",
+        "style-loader": "^2.0.0",
         "vue-template-compiler": "^2.6.11"
     },
     "browserslist": [

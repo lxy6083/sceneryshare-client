@@ -1,9 +1,127 @@
 <template>
   <div>
     <div class="function">
-      <el-button type="primary" @click="toAddShare">添加新动态</el-button>
+      <div class="select">
+        <el-input
+            placeholder="请输入用户名、标题、或内容进行查找"
+            style="width: 400px"
+            size="mini"
+            maxlength="20"
+            show-word-limit
+            v-model="selectWord">
+        </el-input>
+        <el-button
+            size="mini"
+            type="primary"
+            @click="handleSelect"
+            style="margin-left: 30px">
+          查询
+        </el-button>
+      </div>
+      <el-divider></el-divider>
+      <div class="filtrate">
+        <div class="filtrate-item">
+          <span>所在地区</span>
+          <v-distpicker
+              :province="filtrateName.province"
+              :city="filtrateName.city"
+              :area="filtrateName.district"
+              @province="onChangeProvince"
+              @city="onChangeCity"
+              @area="onChangeDistrict">
+          </v-distpicker>
+        </div>
+        <div class="filtrate-item">
+          <span>景点</span>
+          <el-select v-model="filtrateName.scenery" placeholder="请选择" size="mini">
+            <el-option
+                v-for="item in sceneryList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </div>
+        <div class="filtrate-item">
+          <span>天气</span>
+          <el-select v-model="filtrateName.weather" placeholder="请选择" size="mini">
+            <el-option
+                v-for="item in weatherList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <div class="filtrate-item">
+          <span>时段</span>
+          <el-select v-model="filtrateName.timeBucket" placeholder="请选择" size="mini">
+            <el-option
+                v-for="item in timeBucketList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <div class="filtrate-item">
+          <span>季节</span>
+          <el-select v-model="filtrateName.season" placeholder="请选择" size="mini">
+            <el-option
+                v-for="item in seasonList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <div class="filtrate-item">
+          <span>朝向</span>
+          <el-select v-model="filtrateName.bearing" placeholder="请选择" size="mini">
+            <el-option
+                v-for="item in bearingList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <el-button type="primary" size="mini" @click="handleFiltrate">筛选</el-button>
+      </div>
+      <el-divider></el-divider>
+      <div class="sort">
+        <span>排序字段</span>
+        <el-select
+            style="margin-right: 30px"
+            v-model="sort.sortName"
+            placeholder="请选择排序字段"
+            class="handle-select"
+            size="mini"
+            @change="handleSort">
+          <el-option
+              v-for="item in sortNameOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+        <span>排序方式</span>
+        <el-select
+            v-model="sort.type"
+            placeholder="请选择排序方式"
+            class="handle-select"
+            size="mini"
+            @change="handleSort">
+          <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+          </el-option>
+        </el-select>
+      </div>
     </div>
-    <div class="all-share" v-for="item in allShare">
+    <div class="all-share" v-for="item in showShare">
       <div class="share" @click="toShareDetail(item.id)">
         <div class="essence" v-if="item.essence === 1">
           <div class="triangle"></div>
@@ -81,7 +199,7 @@ import {mapGetters} from 'vuex';
 import {
   cancelCollect,
   collect,
-  getAllCollect, getAllShare,
+  getAllCollect, getAllScenery, getAllShare,
   getAverageScore, getAvgScore,
   getByPrimaryKey, getComments,
   getSceneryByPrimaryKey,
@@ -89,12 +207,61 @@ import {
   getScoreSum,
   getShareByUserId
 } from "../api";
+import {bearing, season, timeBucket, weather} from "../assets/js/options";
 export default {
   mixins: [mixin],
   data() {
     return {
       allShare: [],      //所有动态
       collects: [],     //收藏列表
+      selectShare: [],    //通过关键字筛选之后的动态
+      filtrateShare: [],  //字段筛选动态
+      sortShare: [],      //排序之后的动态
+      showShare: [],      //显示的动态
+      sort: {
+        sortName: '',     //排序字段
+        sortType: '',     //排序方法
+      },
+      sceneryList: [],  //景点列表
+      weatherList: [],  //季节列表
+      timeBucketList: [],  //时段列表
+      seasonList: [],     //季节列表
+      bearingList: [],        //朝向列表
+      filtrateName: {       //筛选字段
+        province: '',   //省
+        city: '',       //市
+        district: '',   //区
+        scenery: '',    //景点
+        weather: '',    //天气
+        timeBucket: '', //时段
+        season: '',     //季节
+        bearing: '',    //朝向
+      },
+      sortNameOptions: [
+        {
+          value: 'username',
+          label: '用户名'
+        },
+        {
+          value: 'createTime',
+          label: '创建时间'
+        },
+        {
+          value: 'count',
+          label: '用户总动态数'
+        }
+      ],
+      typeOptions: [
+        {
+          value: 'up',
+          label: '升序',
+        },
+        {
+          value: 'down',
+          label: '降序',
+        }
+      ],
+      selectWord: '',       //筛选关键词
       videoVisible: false,  //视频播放弹框是否可见
       playerOptions: {
         // playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
@@ -123,6 +290,10 @@ export default {
     }
   },
   created() {
+    this.weatherList = weather;
+    this.timeBucketList = timeBucket;
+    this.seasonList = season;
+    this.bearingList = bearing;
     this.getData();
     this.getAllCollect();
   },
@@ -144,6 +315,7 @@ export default {
                 this.allShare.push(item);
               }
             }
+            this.showShare = this.allShare;
             this.getUserInfo();
             this.getSceneryInfo();
             this.getAverageScore();
@@ -224,6 +396,18 @@ export default {
             })
       })
     },
+    //获取景点列表
+    getAllScenery() {
+      getAllScenery()
+          .then(res => {
+            for (let item of res) {
+              if (item.flag === 1) {
+                this.sceneryList.push(item);
+              }
+            }
+            console.log(this.sceneryList);
+          })
+    },
     //取消收藏
     cancelCollect(id) {
       cancelCollect(this.userId,id)
@@ -288,6 +472,40 @@ export default {
           id: id
         }
       })
+    },
+    //查找
+    handleSelect() {
+      if (this.selectWord === '') {
+        this.showShare = this.allShare;
+        this.selectShare = this.allShare;
+      } else {
+        this.showShare = this.allShare.filter(value => {
+          return value.title.includes(this.selectWord)
+              || value.content.includes(this.selectWord)
+              || value.user.username.includes(this.selectWord);
+        })
+        this.selectShare = this.allShare;
+      }
+    },
+    onChangeProvince(data) {
+      this.filtrateName.province = data.value;
+      console.log(data.value);
+    },
+    onChangeCity(data) {
+      this.filtrateName.city = data.value;
+      console.log(data.value);
+    },
+    onChangeDistrict(data) {
+      this.filtrateName.district = data.value;
+      console.log(data.value);
+    },
+    //筛选
+    handleFiltrate() {
+
+    },
+    //排序
+    handleSort() {
+
     }
   },
   computed: {
@@ -303,7 +521,44 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  .function {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%,0);
+    padding: 30px 20px;
+    background-color: #ffffff;
+    margin-top: 10px;
+    width: 800px;
+    .filtrate {
+      margin: 10px 0;
+      .filtrate-item {
+        display: inline-block;
+        margin: 10px 20px;
+        span {
+          display: inline-block;
+          margin: 0 10px;
+          font-size: 14px;
+        }
+        ::v-deep .distpicker-address-wrapper {
+          display: inline-block;
+        }
+        ::v-deep .distpicker-address-wrapper select {
+          display: inline-block;
+          padding: .25rem .75rem;
+          height: 26px;
+          font-size: .5rem;
+        }
+      }
+    }
+    .sort {
+      span {
+        display: inline-block;
+        margin: 0 10px;
+        font-size: 14px;
+      }
+    }
+  }
   .share {
     position: relative;
     left: 50%;

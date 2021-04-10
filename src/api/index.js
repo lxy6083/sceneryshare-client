@@ -45,6 +45,9 @@ export const getFirstScenery = () => get(`/scenery/getFirstScenery`);
 //获取二级景点
 export const getSecondScenery = () => get(`/scenery/getSecondScenery`);
 
+//获取所有的景点
+export const getAllScenery = () => get(`/scenery/getAllScenery`);
+
 //通过景点id获取景点信息
 export const getSceneryByPrimaryKey = (id) => get(`/scenery/getByPrimaryKey?id=${id}`);
 
@@ -89,3 +92,9 @@ export const isCollect = (sceneryshareId,userId) => get(`/collect/isCollect?user
 
 //通过动态id获取评论列表
 export const getComments = (sceneryshareId) => get(`/comment/getBySceneryshareId?sceneryshareId=${sceneryshareId}`);
+
+//发表评论
+export const addComment = (params) => post(`/comment/insert`, params);
+
+//删除评论
+export const deleteComment = (id) => get(`/comment/delete?id=${id}`);

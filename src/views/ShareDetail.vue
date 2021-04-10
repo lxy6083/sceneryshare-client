@@ -90,29 +90,51 @@
         <div class="avatar">
           <img :src="getUrl(avatar)">
         </div>
-        <div class="comment-textarea">
-          <el-input
-              type="textarea"
-              resize="none"
-              :rows="2"
-              placeholder="请输入内容"
-              v-model="comment">
-          </el-input>
-          <el-button type="primary" circle size="max" @click="submitComment">发表评论</el-button>
+        <div class="function-box">
+          <div class="comment-textarea">
+            <el-input
+                type="textarea"
+                resize="none"
+                :rows="4"
+                placeholder="请输入内容"
+                v-model="comment">
+            </el-input>
+          </div>
+          <el-button
+              type="primary"
+              round size="max"
+              @click="submitComment">
+            <div class="button-text">发表</div>
+            <div class="button-text">评论</div>
+          </el-button>
+          <el-divider></el-divider>
         </div>
       </div>
       <div class="comments">
-        <div class="comment">
-          <div class="name-time">
-            <div class="username" v-if="share.user && share.user.username">
-              {{share.user.username}}
+        <div class="comment" v-for="item in comments">
+          <div class="avatar" v-if="item.user && item.user.avatar">
+            <img :src="getUrl(item.user.avatar)">
+          </div>
+          <div class="content-box" v-if="item.user">
+            <span class="delete-icon">
+              <i
+                  @mouseover="addActive($event)"
+                  @mouseout="removeActive($event)"
+                  @click="deleteComment(item.id)"
+                  class="el-icon-delete"
+                  v-if="item.user.id == userId || share.userId === userId">
+            </i>
+            </span>
+            <div class="username">
+              {{item.user.username}}
+            </div>
+            <div class="comment-text">
+              {{item.content}}
             </div>
             <div class="createTime">
-              {{share.createTime}}
+              {{item.createTime}}
             </div>
-          </div>
-          <div class="comment-text">
-
+            <el-divider></el-divider>
           </div>
         </div>
       </div>
@@ -136,7 +158,8 @@
 import {mixin} from "../mixins";
 import {mapGetters} from 'vuex';
 import {
-  cancelCollect, collect,
+  addComment,
+  cancelCollect, collect, deleteComment,
   getAllCollect, getAvgScore,
   getByPrimaryKey, getComments,
   getScore,
@@ -242,7 +265,7 @@ export default {
     getScore() {
       getScore(this.id, this.userId)
       .then(res => {
-        this.$set(this.share,'score',res);
+        this.rate = res;
       })
       .catch(err => {
         console.log(err);
@@ -340,27 +363,74 @@ export default {
       .then(res => {
         if (res.code === 1) {
           this.notify(res.msg,'success');
+          this.getAverageScore();
+          this.getScore();
         } else {
           this.notify(res.msg,'error');
+          this.getScore();
         }
       })
       .catch(err => {
         console.log(err);
       })
     },
-
+    //发表评论
+    submitComment() {
+      let params = new URLSearchParams();
+      params.append('userId', this.userId);
+      params.append('sceneryshareId', this.id);
+      params.append('content', this.comment);
+      addComment(params)
+      .then(res => {
+        if (res.code === 1) {
+          this.notify(res.msg, 'success');
+          this.comment = '';
+          this.getComments();
+          this.getCommentsUserInfo();
+        } else {
+          this.notify(res.msg, 'error');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    //激活class
+    addActive(event) {
+      event.currentTarget.className = 'el-icon-delete active';
+    },
+    //移除class
+    removeActive(event) {
+      event.currentTarget.className = 'el-icon-delete';
+    },
+    //删除评论
+    deleteComment(id) {
+      deleteComment(id)
+      .then(res => {
+        if (res === true) {
+          this.notify('评论删除成功','success');
+          this.getComments();
+        } else {
+          this.notify('评论删除失败','error');
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    }
   },
   computed: {
     ...mapGetters([
         'userId',
         'avatar',
-        'username'
+        'username',
+        'url'
     ])
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   .rate {
     position: relative;
     left: 50%;
@@ -481,5 +551,83 @@ export default {
     color: #aaaaaa;
     display: inline-block;
     margin-right: 10px;
+  }
+
+  .comment-area {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%,0);
+    padding: 30px 20px;
+    background-color: #ffffff;
+    margin-top: 20px;
+    width: 800px;
+    .submit-comment {
+      vertical-align: top;
+      .avatar {
+        display: inline-block;
+        margin-top: 20px;
+        margin-right: 40px;
+      }
+      .function-box {
+        display: inline-block;
+        width: 680px;
+        .comment-textarea {
+          display: inline-block;
+          width: 580px;
+        }
+        ::v-deep .el-button {
+          display: inline-block;
+          width: 80px;
+          height: 80px;
+          color: white;
+          vertical-align: top;
+          margin-top: 10px;
+          margin-left: 20px;
+          .button-text {
+            margin-top: 6px;
+            margin-bottom: 6px;
+          }
+        }
+        ::v-deep .el-divider {
+          margin-top: 50px;
+        }
+      }
+    }
+  }
+
+  .comments {
+    .comment {
+      .avatar {
+        display: inline-block;
+        margin-right: 40px;
+      }
+      .content-box {
+        display: inline-block;
+        position: relative;
+        width: 680px;
+        ::v-deep .el-icon-delete {
+          position: absolute;
+          right: 20px;
+        }
+        .active {
+          color: #fb7299;
+          cursor: pointer;
+        }
+        .username {
+          font-size: 12px;
+          color: #6d757a;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+        .createTime {
+          font-size: 12px;
+          color: #aaaaaa;
+          margin-top: 10px;
+        }
+        ::v-deep .el-divider {
+          margin-top: 24px;
+        }
+      }
+    }
   }
 </style>
