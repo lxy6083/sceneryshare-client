@@ -107,7 +107,7 @@
         </el-select>
         <span>排序方式</span>
         <el-select
-            v-model="sort.type"
+            v-model="sort.sortType"
             placeholder="请选择排序方式"
             class="handle-select"
             size="mini"
@@ -201,7 +201,7 @@ import {
   collect,
   getAllCollect, getAllScenery, getAllShare,
   getAverageScore, getAvgScore,
-  getByPrimaryKey, getComments,
+  getByPrimaryKey, getCollectNum, getComments,
   getSceneryByPrimaryKey,
   getScoreNum,
   getScoreSum,
@@ -227,6 +227,16 @@ export default {
       timeBucketList: [],  //时段列表
       seasonList: [],     //季节列表
       bearingList: [],        //朝向列表
+      isEssence: [          //是否精华
+        {
+          value: 1,
+          label: '是'
+        },
+        {
+          value: 0,
+          label: '否'
+        },
+      ],
       filtrateName: {       //筛选字段
         province: '',   //省
         city: '',       //市
@@ -236,6 +246,7 @@ export default {
         timeBucket: '', //时段
         season: '',     //季节
         bearing: '',    //朝向
+        essence: ''     //精华
       },
       sortNameOptions: [
         {
@@ -247,8 +258,16 @@ export default {
           label: '创建时间'
         },
         {
-          value: 'count',
-          label: '用户总动态数'
+          value: 'commentNum',
+          label: '评论数'
+        },
+        {
+          value: 'collectNum',
+          label: '收藏数'
+        },
+        {
+          value: 'avgScore',
+          label: '平均评分'
         }
       ],
       typeOptions: [
@@ -306,6 +325,13 @@ export default {
     toAddShare() {
       this.$router.push('/addShare');
     },
+    //初始化所有动态数组
+    initShareArray() {
+      this.selectShare = this.allShare;
+      this.filtrateShare = this.allShare;
+      this.sortShare = this.allShare;
+      this.showShare = this.allShare;
+    },
     //获取所有动态信息
     getData() {
       getAllShare()
@@ -315,11 +341,12 @@ export default {
                 this.allShare.push(item);
               }
             }
-            this.showShare = this.allShare;
+            this.initShareArray();
             this.getUserInfo();
             this.getSceneryInfo();
             this.getAverageScore();
             this.getComments();
+            this.getCollectNum();
           })
           .catch(err => {
             console.log(err);
@@ -407,6 +434,18 @@ export default {
             }
             console.log(this.sceneryList);
           })
+    },
+    //获取收藏数
+    getCollectNum() {
+      this.allShare.forEach(item => {
+        getCollectNum(item.id)
+            .then(res => {
+              this.$set(item,'collectNum',res);
+            })
+            .catch(err => {
+              console.log(err);
+            })
+      })
     },
     //取消收藏
     cancelCollect(id) {
@@ -501,11 +540,118 @@ export default {
     },
     //筛选
     handleFiltrate() {
-
+      if (this.sort.sortName !== '' && this.sort.sortType !== '') {
+        this.filtrateShare = this.showShare;
+      } else {
+        this.filtrateShare = this.selectShare;
+      }
+      if (this.filtrateName.province !== '省' && this.filtrateName.province !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.scenery.province === this.filtrateName.province;
+        })
+      }
+      if (this.filtrateName.city !== '市' && this.filtrateName.city !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.scenery.city === this.filtrateName.city;
+        })
+      }
+      if (this.filtrateName.district !== '区' && this.filtrateName.city !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.scenery.district === this.filtrateName.district;
+        })
+      }
+      if (this.filtrateName.scenery !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.scenery.name === this.filtrateName.scenery;
+        })
+      }
+      if (this.filtrateName.weather !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.weather === this.filtrateName.weather;
+        })
+      }
+      if (this.filtrateName.timeBucket !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.timeBucket === this.filtrateName.timeBucket;
+        })
+      }
+      if (this.filtrateName.season !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.season === this.filtrateName.season;
+        })
+      }
+      if (this.filtrateName.bearing !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.bearing === this.filtrateName.bearing;
+        })
+      }
+      if (this.filtrateName.essence !== '') {
+        this.filtrateShare = this.filtrateShare.filter(value => {
+          return value.essence === this.filtrateName.essence;
+        })
+      }
+      this.showShare = this.filtrateShare;
     },
     //排序
     handleSort() {
-
+      this.sortShare = this.showShare;
+      if (this.sort.sortName === 'username') {
+        switch (this.sort.sortType) {
+          case 'up':
+            this.showShare = this.sortShare.sort(function (a, b) {
+              return a.user.username < b.user.username ? -1 : a.user.username > b.user.username ? 1 : 0;
+            })
+            break;
+          case 'down': this.showShare = this.sortShare.sort(function (a, b) {
+            return a.user.username < b.user.username ? 1 : a.user.username > b.user.username ? -1 : 0;
+          })
+            break;
+        }
+      } else if (this.sort.sortName === 'createTime') {
+        switch (this.sort.sortType) {
+          case 'up': this.showShare = this.sortShare.sort(function (a, b) {
+            return a.createTime < b.createTime ? -1 : a.createTime > b.createTime ? 1 : 0;
+          })
+            break;
+          case 'down': this.showShare = this.sortShare.sort(function (a, b) {
+            return a.createTime < b.createTime ? 1 : a.createTime > b.createTime ? -1 : 0;
+          })
+            break;
+        }
+      } else if (this.sort.sortName === 'commentNum') {
+        switch (this.sort.sortType) {
+          case 'up': this.showShare = this.sortShare.sort(function (a, b) {
+            return a.commentNum - b.commentNum;
+          })
+            break;
+          case 'down': this.showShare = this.sortShare.sort(function (a, b) {
+            return b.commentNum - a.commentNum;
+          })
+            break;
+        }
+      } else if (this.sort.sortName === 'collectNum') {
+        switch (this.sort.sortType) {
+          case 'up': this.showShare = this.sortShare.sort(function (a, b) {
+            return a.collectNum - b.collectNum;
+          })
+            break;
+          case 'down': this.showShare = this.sortShare.sort(function (a, b) {
+            return b.collectNum - a.collectNum;
+          })
+            break;
+        }
+      } else if (this.sort.sortName === 'avgScore') {
+        switch (this.sort.sortType) {
+          case 'up': this.showShare = this.sortShare.sort(function (a, b) {
+            return a.avgScore - b.avgScore;
+          })
+            break;
+          case 'down': this.showShare = this.sortShare.sort(function (a, b) {
+            return b.avgScore - a.avgScore;
+          })
+            break;
+        }
+      }
     }
   },
   computed: {

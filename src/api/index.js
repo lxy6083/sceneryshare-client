@@ -88,6 +88,9 @@ export const cancelCollect = (userId,sceneryshareId) => get(`/collect/delete?use
 //是否收藏
 export const isCollect = (sceneryshareId,userId) => get(`/collect/isCollect?userId=${userId}&sceneryshareId=${sceneryshareId}`);
 
+//获取收藏数
+export const getCollectNum = (sceneryshareId) => get(`/collect/getCollectNum?sceneryshareId=${sceneryshareId}`);
+
 /* =======================评论相关函数====================== */
 
 //通过动态id获取评论列表
