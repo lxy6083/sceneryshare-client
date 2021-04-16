@@ -82,11 +82,14 @@ export default {
     handleMenu(path) {
       if (path == 0) {
         this.$store.commit('setIsLogin', false);
+        sessionStorage.setItem('isLogin', false);
         this.$router.go(0);
         //退出
       } else if (path == -1) {
         //注销
         this.delete(this.userId);
+        sessionStorage.setItem('isLogin', false);
+        this.$router.replace('/home');
       } else {
         //页面跳转
         if (this.$route.path !== path) {
