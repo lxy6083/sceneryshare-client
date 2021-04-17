@@ -36,9 +36,9 @@
           <el-select v-model="filtrateName.scenery" placeholder="请选择" size="mini">
             <el-option
                 v-for="item in sceneryList"
-                :key="item.id"
+                :key="item.name"
                 :label="item.name"
-                :value="item.id">
+                :value="item.name">
             </el-option>
           </el-select>
         </div>
@@ -158,10 +158,10 @@
           </div>
           <div class="footer">
             <div class="collect footer-item">
-              <div class="el-icon-collection-tag" v-if="isCollect(item.id) === true" @click="cancelCollect(item.id)">
+              <div class="el-icon-collection-tag" v-if="isCollect(item.id) === true" @click.stop="cancelCollect(item.id)">
                 <span>已收藏</span>
               </div>
-              <div class="el-icon-collection-tag" v-else @click="collect(item.id)">
+              <div class="el-icon-collection-tag" v-else @click.stop="collect(item.id)">
                 <span>未收藏</span>
               </div>
             </div>
@@ -306,6 +306,9 @@ export default {
           fullscreenToggle: true //全屏按钮
         }
       },
+      //获取到的景点名称
+      sceneryName: '',
+      flag: false,
     }
   },
   created() {
@@ -315,6 +318,18 @@ export default {
     this.bearingList = bearing;
     this.getData();
     this.getAllCollect();
+    this.getAllScenery();
+    if (this.$route.query.sceneryId) {
+      this.flag = true;
+    }
+  },
+  beforeUpdate() {
+    if (this.flag === true) {
+      console.log(111);
+      this.filtrateName.scenery = this.$route.query.sceneryId;
+      this.handleFiltrate();
+      this.flag = false;
+    }
   },
   methods: {
     //根据相对路径获取绝对路径

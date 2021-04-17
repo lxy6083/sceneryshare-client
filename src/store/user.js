@@ -3,6 +3,7 @@ export default {
     userId: '',         //用户ID
     username: '',       //用户账号
     avatar: '',         //用户头像
+    center: '',         //地图坐标中心
   },
   getters: {
     userId: state => {
@@ -25,6 +26,13 @@ export default {
         avatar = JSON.parse(window.sessionStorage.getItem('avatar')) ;
       }
       return avatar;
+    },
+    center: state => {
+      let center = state.center;
+      if(!center) {
+        center = JSON.parse(window.sessionStorage.getItem('center')) ;
+      }
+      return center;
     }
   },
   mutations: {
@@ -39,6 +47,10 @@ export default {
     setAvatar:(state,avatar) => {
       state.avatar = avatar;
       window.sessionStorage.setItem('avatar',JSON.stringify(avatar));
+    },
+    setCenter:(state,center) => {
+      state.center = center;
+      window.sessionStorage.setItem('center',JSON.stringify(center));
     }
   }
 }

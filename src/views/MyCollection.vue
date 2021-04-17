@@ -36,9 +36,9 @@
           <el-select v-model="filtrateName.scenery" placeholder="请选择" size="mini">
             <el-option
                 v-for="item in sceneryList"
-                :key="item.id"
+                :key="item.name"
                 :label="item.name"
-                :value="item.id">
+                :value="item.name">
             </el-option>
           </el-select>
         </div>
@@ -196,7 +196,7 @@ import {
   cancelCollect,
   getAllCollect, getAllScenery, getAvgScore,
   getByPrimaryKey, getCollectNum,
-  getComments,
+  getComments, getSceneryByPrimaryKey,
   getScoreNum,
   getScoreSum,
   getShareByPrimaryKey
@@ -311,6 +311,7 @@ export default {
     this.seasonList = season;
     this.bearingList = bearing;
     this.getAllCollect();
+    this.getAllScenery();
   },
   mounted() {
     this.getAverageScore();
@@ -387,6 +388,18 @@ export default {
             }
             console.log(this.sceneryList);
           })
+    },
+    //获取景点信息
+    getSceneryInfo() {
+      this.myCollects.forEach(item => {
+        getSceneryByPrimaryKey(item.sceneryId)
+            .then(res => {
+              this.$set(item,'scenery',res);
+            })
+            .catch(err => {
+              console.log(err);
+            })
+      })
     },
     //获取收藏数
     getCollectNum(item) {

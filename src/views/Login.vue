@@ -128,7 +128,6 @@ export default {
                   this.$store.commit('setUserId',res.userMsg.id);
                   this.$store.commit('setUsername',res.userMsg.username);
                   this.$store.commit('setAvatar',res.userMsg.avatar);
-
                 }else {
                   this.notify(res.msg,"error");
                 }

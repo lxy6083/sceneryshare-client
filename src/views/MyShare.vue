@@ -36,9 +36,9 @@
           <el-select v-model="filtrateName.scenery" placeholder="请选择" size="mini">
             <el-option
                 v-for="item in sceneryList"
-                :key="item.id"
+                :key="item.name"
                 :label="item.name"
-                :value="item.id">
+                :value="item.name">
             </el-option>
           </el-select>
         </div>
@@ -172,10 +172,10 @@
           </div>
           <div class="footer">
             <div class="collect footer-item">
-              <div class="el-icon-collection-tag" v-if="isCollect(item.id) === true" @click="cancelCollect(item.id)">
+              <div class="el-icon-collection-tag" v-if="isCollect(item.id) === true" @click.stop="cancelCollect(item.id)">
                 <span>已收藏</span>
               </div>
-              <div class="el-icon-collection-tag" v-else @click="collect(item.id)">
+              <div class="el-icon-collection-tag" v-else @click.stop="collect(item.id)">
                 <span>未收藏</span>
               </div>
             </div>
@@ -347,6 +347,7 @@ export default {
       this.filtrateShare = this.myShare;
       this.sortShare = this.myShare;
       this.showShare = this.myShare;
+      console.log('this.filtrateShare',this.filtrateShare);
     },
     //获取我的动态信息
     getData() {
