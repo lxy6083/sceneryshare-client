@@ -2,8 +2,7 @@
 const navMsg = [
   {name: '首页',path: '/home'},
   {name: '动态',path: '/share'},
-  {name: '我的动态',path: '/myShare'},
-  {name: '我的收藏',path: '/myCollection'}
+
 ]
 
 //右侧导航栏
@@ -16,6 +15,8 @@ const loginMsg = [
 const menuList = [
   {name: '信息修改', path: '/updateUser'},
   {name: '意见反馈', path: '/feedback'},
+  {name: '我的动态',path: '/myShare'},
+  {name: '我的收藏',path: '/myCollection'},
   {name: '退出', path: 0},
   {name: '注销', path: -1}
 ]

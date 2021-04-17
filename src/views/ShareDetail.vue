@@ -355,45 +355,53 @@ export default {
     },
     //评分
     mark() {
-      let params = new URLSearchParams();
-      params.append('sceneryshareId',this.id);
-      params.append('userId',this.userId);
-      params.append('score',this.rate);
-      mark(params)
-      .then(res => {
-        if (res.code === 1) {
-          this.notify(res.msg,'success');
-          this.getAverageScore();
-          this.getScore();
-        } else {
-          this.notify(res.msg,'error');
-          this.getScore();
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      })
+      if (sessionStorage.getItem('isLogin') === 'true') {
+        let params = new URLSearchParams();
+        params.append('sceneryshareId',this.id);
+        params.append('userId',this.userId);
+        params.append('score',this.rate);
+        mark(params)
+            .then(res => {
+              if (res.code === 1) {
+                this.notify(res.msg,'success');
+                this.getAverageScore();
+                this.getScore();
+              } else {
+                this.notify(res.msg,'error');
+                this.getScore();
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            })
+      } else {
+        this.notify('请先登录','error');
+      }
     },
     //发表评论
     submitComment() {
-      let params = new URLSearchParams();
-      params.append('userId', this.userId);
-      params.append('sceneryshareId', this.id);
-      params.append('content', this.comment);
-      addComment(params)
-      .then(res => {
-        if (res.code === 1) {
-          this.notify(res.msg, 'success');
-          this.comment = '';
-          this.getComments();
-          this.getCommentsUserInfo();
-        } else {
-          this.notify(res.msg, 'error');
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      })
+      if (sessionStorage.getItem('isLogin') === 'true') {
+        let params = new URLSearchParams();
+        params.append('userId', this.userId);
+        params.append('sceneryshareId', this.id);
+        params.append('content', this.comment);
+        addComment(params)
+            .then(res => {
+              if (res.code === 1) {
+                this.notify(res.msg, 'success');
+                this.comment = '';
+                this.getComments();
+                this.getCommentsUserInfo();
+              } else {
+                this.notify(res.msg, 'error');
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            })
+      } else {
+        this.notify('请先登录','error');
+      }
     },
     //激活class
     addActive(event) {

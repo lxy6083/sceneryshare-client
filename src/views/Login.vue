@@ -88,12 +88,17 @@ export default {
 				],
 			},
 			verifyCode: null,
+      //登录之后要跳转的路由
+      route: '',
 		};
 	},
 	mounted() {
 		this.verifyCode = new GVerify("v_container");
 	},
-	methods: {
+  created() {
+	  this.route = this.$route.query.redirect;
+  },
+  methods: {
 		submitForm(formName) {
 			var that = this;
 			// 获取验证码
@@ -111,12 +116,19 @@ export default {
           getLoginStatus(params)
             .then(res => {
                 if(res.code == 1) {
-                  this.$router.push('/home');
+                  console.log(this.route);
+                  sessionStorage.setItem('isLogin', true);
+                  if (this.route === '/login' || this.route === undefined || this.route === '') {
+                    this.$router.push('/home');
+                  } else {
+                    this.$router.push(this.route);
+                  }
                   this.notify("登陆成功","success");
                   this.$store.commit('setIsLogin',true);
                   this.$store.commit('setUserId',res.userMsg.id);
                   this.$store.commit('setUsername',res.userMsg.username);
                   this.$store.commit('setAvatar',res.userMsg.avatar);
+
                 }else {
                   this.notify(res.msg,"error");
                 }
